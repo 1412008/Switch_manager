@@ -14,7 +14,7 @@ import com.mongodb.MongoClient;
 @EnableMongoRepositories("web")
 @Configuration
 @ComponentScan("web")
-@PropertySource("classpath:mongo.properties")
+@PropertySource("classpath:application.properties")
 public class MongoConfig {
 	@Autowired
 	private Environment env;

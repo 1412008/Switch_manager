@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
@@ -15,13 +16,10 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
-@PropertySource("classpath:mongo.properties")
 public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	@Autowired
-	private Environment env;
-
-	private int EXPIRES_IN = 18000;// Integer.parseInt(env.getProperty("jwt.expires_in"));
+	@Value("${jwt.expires_in}")
+	private int EXPIRES_IN;
 
 	@Autowired
 	TokenHelper tokenHelper;
