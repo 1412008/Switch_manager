@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import io.jsonwebtoken.Claims;
 import web.DAO.UserRepository;
 import web.models.User;
 import web.models.UserType;
+import web.security.TokenHelper;
 
 @RestController
 public class LoginController {
@@ -44,12 +46,21 @@ public class LoginController {
 		return mv;
 	}
 
+	@Autowired
+	TokenHelper tokenHelper;
+	
 	@RequestMapping(value = "home", method = RequestMethod.GET)
 	public ModelAndView home(Principal principal, HttpServletRequest req, HttpServletResponse res) {
 		System.out.println("home");
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("welcome");
-		System.out.println((req.getHeader("api-token") == null) ? "null" : req.getHeader("api-token"));
+		String token = req.getHeader("Authentication"); 
+		if (token != null) {
+			Claims cl = tokenHelper.getClaimsFromToken(token);
+			System.out.println(cl.getIssuedAt());
+			System.out.println(cl.getExpiration());
+			
+		}
 		if (principal != null) {
 			User us = uRepo.findByUserName(principal.getName());
 			if (us != null) {

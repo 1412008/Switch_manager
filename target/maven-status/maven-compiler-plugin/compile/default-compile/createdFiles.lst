@@ -6,8 +6,10 @@ web\DAO\SwitchRepository.class
 web\Services\SwitchServiceImpl.class
 web\DAO\UserRepository.class
 web\models\Switch.class
-web\Services\UserService.class
 web\DBHelper\DbConfig.class
+web\Services\UserDetailsServiceImpl.class
+web\security\TokenAuthenticationFilter.class
+web\security\TokenHelper.class
 web\Services\SwitchService.class
 web\controllers\SwitchController3.class
 web\DAO\SwitchDaoImpl.class

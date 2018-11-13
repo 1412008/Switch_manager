@@ -12,8 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import web.Services.UserService;
+import web.Services.UserDetailsServiceImpl;
+import web.security.AuthenticationFailureHandler;
+import web.security.AuthenticationSuccessHandler;
+import web.security.TokenAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -22,7 +26,7 @@ public class SpringSecutiryConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	@Qualifier("customUserDetailsService")
-	UserService userDetailsService;
+	UserDetailsServiceImpl userDetailsService;
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -44,16 +48,30 @@ public class SpringSecutiryConfig extends WebSecurityConfigurerAdapter {
 	    return new BCryptPasswordEncoder();
 	}
 
+	@Bean
+    public TokenAuthenticationFilter jwtAuthenticationTokenFilter() throws Exception {
+        return new TokenAuthenticationFilter();
+    }
+
+    @Autowired
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private AuthenticationFailureHandler authenticationFailureHandler;
+    
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
 
 		// @formatter:off
+		http.addFilterBefore(jwtAuthenticationTokenFilter(), BasicAuthenticationFilter.class).authorizeRequests();
     	http.formLogin()
         .loginPage("/login")
         .loginProcessingUrl("/login_check")
-        .defaultSuccessUrl("/home")
-        .failureUrl("/login")
+        //.defaultSuccessUrl("/home")
+        //.failureUrl("/login")
+        .successHandler(authenticationSuccessHandler)
+        .failureHandler(authenticationFailureHandler)
         .usernameParameter("usname")
         .passwordParameter("password")
         .and().logout().logoutUrl("/logout").logoutSuccessUrl("/login");
@@ -64,7 +82,7 @@ public class SpringSecutiryConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/api/*").access("hasAnyRole('ROLE_ADMIN')");
 		http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/denied");
 
-		http.rememberMe().key("supersecret").tokenValiditySeconds(5*60*60);
+		//http.rememberMe().key("supersecret").tokenValiditySeconds(5*60*60);
 		
 		System.out.println("Config");
 	}
