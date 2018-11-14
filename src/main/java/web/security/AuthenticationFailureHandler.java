@@ -17,7 +17,7 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
 			AuthenticationException exception) throws IOException, ServletException {
 
 		//super.onAuthenticationFailure(req, res, exception);
-		System.out.println("log in fail");
+		System.out.println("login fail");
 		res.sendRedirect("login");
 	}
 }

@@ -1,7 +1,6 @@
 package web.security;
 
 import java.io.IOException;
-import java.security.Principal;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -9,25 +8,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import web.GlobalVar.JwtVariable;
 import web.Services.UserDetailsServiceImpl;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
-	@Value("${jwt.header}")
-	private String AUTH_HEADER;
-
+	
 	@Autowired
 	UserDetailsServiceImpl userDetailServiceImpl;
 
 	@Autowired
 	private TokenHelper tokenHelper;
+	
+	@Autowired
+	JwtVariable jwtVariable;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
@@ -35,7 +33,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 		String error = "";
 		String authToken = getToken(req);
 		System.out.println("Got token: " + authToken);
-		System.out.println(AUTH_HEADER);
 
 		if (tokenHelper.validateToken(authToken)) {
 			if (authToken != null) {
@@ -51,6 +48,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 				}
 			}
 		} else {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+			if (auth != null) {
+				System.out.println(auth.getName());
+			}
 			System.out.println("Invalid token!");
 		}
 		if (!error.equals("")) {
@@ -61,7 +62,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private String getToken(HttpServletRequest req) {
-		String authHeader = req.getHeader(AUTH_HEADER);
+		String authHeader = req.getHeader(jwtVariable.getHEADER());
 		if (authHeader != null) {
 			return authHeader;
 		}

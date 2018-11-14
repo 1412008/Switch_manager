@@ -12,7 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+//import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import web.Services.UserDetailsServiceImpl;
 import web.security.AuthenticationFailureHandler;
@@ -64,7 +65,7 @@ public class SpringSecutiryConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 
 		// @formatter:off
-		http.addFilterBefore(jwtAuthenticationTokenFilter(), BasicAuthenticationFilter.class).authorizeRequests();
+		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class).authorizeRequests();
     	http.formLogin()
         .loginPage("/login")
         .loginProcessingUrl("/login_check")

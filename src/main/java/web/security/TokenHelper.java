@@ -4,9 +4,6 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,6 +11,7 @@ import org.springframework.util.StringUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import web.GlobalVar.JwtVariable;
 
 @Component
 public class TokenHelper {
@@ -21,12 +19,8 @@ public class TokenHelper {
 	@Autowired
 	PasswordEncoder passwordEncoder; 
 	
-	@Value("${jwt.secret}")
-	private String SECRET;
-	@Value("${jwt.expires_in}")
-	private int EXPIRES_IN;
-	@Value("${jwt.app_name}")
-	private String APP_NAME;
+	@Autowired 
+	JwtVariable jwtVariable;
 
 	private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 
@@ -42,17 +36,17 @@ public class TokenHelper {
 	}
 
 	@SuppressWarnings("deprecation")
-	public String generateToken(String username) {
-		System.out.println(SECRET + "\nLength: " + SECRET.length());
-		String jws = Jwts.builder().setIssuer(APP_NAME).setSubject(username).setIssuedAt(generateCurrentDate())
-				.setExpiration(generateExpirationDate()).signWith(SIGNATURE_ALGORITHM, SECRET).compact();
+	public String generateToken(String username) {		
+		//System.out.println(jwtVariable.getSECRET() + "\nLength: " + jwtVariable.getSECRET().length());
+		String jws = Jwts.builder().setIssuer(jwtVariable.getAPP_NAME()).setSubject(username).setIssuedAt(generateCurrentDate())
+				.setExpiration(generateExpirationDate()).signWith(SIGNATURE_ALGORITHM, jwtVariable.getSECRET()).compact();
 		return jws;
 	}
 
 	public Claims getClaimsFromToken(String token) {
 		Claims claims;
 		try {
-			claims = Jwts.parser().setSigningKey(this.SECRET).parseClaimsJws(token).getBody();
+			claims = Jwts.parser().setSigningKey(jwtVariable.getSECRET()).parseClaimsJws(token).getBody();
 		} catch (Exception e) {
 			claims = null;
 		}
@@ -68,7 +62,7 @@ public class TokenHelper {
 	}
 
 	private Date generateExpirationDate() {
-		return new Date(getCurrentTimeMillis() + this.EXPIRES_IN * 1000);
+		return new Date(getCurrentTimeMillis() + jwtVariable.getEXPIRES_IN() * 1000);
 	}
 	
 	

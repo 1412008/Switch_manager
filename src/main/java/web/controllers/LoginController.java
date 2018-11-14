@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import io.jsonwebtoken.Claims;
 import web.DAO.UserRepository;
+import web.GlobalVar.JwtVariable;
 import web.models.User;
 import web.models.UserType;
 import web.security.TokenHelper;
@@ -49,13 +50,17 @@ public class LoginController {
 	@Autowired
 	TokenHelper tokenHelper;
 	
+	@Autowired
+	JwtVariable jwtVariable;  
+	
 	@RequestMapping(value = "home", method = RequestMethod.GET)
 	public ModelAndView home(Principal principal, HttpServletRequest req, HttpServletResponse res) {
 		System.out.println("home");
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("welcome");
-		String token = req.getHeader("Authentication"); 
-		if (token != null) {
+		String token = req.getHeader(jwtVariable.getHEADER());
+		System.out.println("Token: " + token);
+		if (token != null && tokenHelper.validateToken(token)) {
 			Claims cl = tokenHelper.getClaimsFromToken(token);
 			System.out.println(cl.getIssuedAt());
 			System.out.println(cl.getExpiration());

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import web.DAO.SwitchRepository;
 import web.models.Switch;
+import web.security.TokenHelper;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,8 +44,18 @@ public class SwitchController3 {
 		return null;
 	}
 	
+	@Autowired
+	TokenHelper tokenHelper;
+	
 	@RequestMapping(value = "switch", method = RequestMethod.POST)
-	public ResponseEntity<HttpStatus> createSwitch(@RequestBody Switch body) {
+	public ResponseEntity<HttpStatus> createSwitch(@RequestBody Switch body, HttpServletRequest req) {
+		String token = req.getHeader("Authentication");
+		System.out.println("Token: " + token);
+		if (token == null || !tokenHelper.validateToken(token)) {
+			System.out.println("Invalid token!");
+			return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
+		}
+		
 		try {
 			if (!body.IsNullOrEmpty()) {
 				body.setId(null);
