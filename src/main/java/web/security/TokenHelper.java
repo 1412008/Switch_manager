@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -17,9 +16,6 @@ import web.GlobalVar.JwtVariable;
 public class TokenHelper {
 
 	@Autowired
-	PasswordEncoder passwordEncoder; 
-	
-	@Autowired 
 	JwtVariable jwtVariable;
 
 	private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
@@ -36,10 +32,12 @@ public class TokenHelper {
 	}
 
 	@SuppressWarnings("deprecation")
-	public String generateToken(String username) {		
-		//System.out.println(jwtVariable.getSECRET() + "\nLength: " + jwtVariable.getSECRET().length());
-		String jws = Jwts.builder().setIssuer(jwtVariable.getAPP_NAME()).setSubject(username).setIssuedAt(generateCurrentDate())
-				.setExpiration(generateExpirationDate()).signWith(SIGNATURE_ALGORITHM, jwtVariable.getSECRET()).compact();
+	public String generateToken(String username) {
+		// System.out.println(jwtVariable.getSECRET() + "\nLength: " +
+		// jwtVariable.getSECRET().length());
+		String jws = Jwts.builder().setIssuer(jwtVariable.getAPP_NAME()).setSubject(username)
+				.setIssuedAt(generateCurrentDate()).setExpiration(generateExpirationDate())
+				.signWith(SIGNATURE_ALGORITHM, jwtVariable.getSECRET()).compact();
 		return jws;
 	}
 
@@ -64,14 +62,12 @@ public class TokenHelper {
 	private Date generateExpirationDate() {
 		return new Date(getCurrentTimeMillis() + jwtVariable.getEXPIRES_IN() * 1000);
 	}
-	
-	
-	
+
 	private boolean isTokenExpired(String token) {
-	    Date expiration = getExpirationDateFromToken(token);
-	    return expiration.before(new Date());
-	  }
-	
+		Date expiration = getExpirationDateFromToken(token);
+		return expiration.before(new Date());
+	}
+
 	private Date getExpirationDateFromToken(String token) {
 		Claims claims = getClaimsFromToken(token);
 		return claims.getExpiration();
@@ -81,15 +77,15 @@ public class TokenHelper {
 		if (StringUtils.isEmpty(token)) {
 			return false;
 		}
-		
+
 		if (StringUtils.isEmpty(getUsernameFromToken(token))) {
 			return false;
 		}
-		
+
 		if (isTokenExpired(token)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 

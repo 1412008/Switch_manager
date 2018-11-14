@@ -17,13 +17,13 @@ import web.GlobalVar.JwtVariable;
 import web.Services.UserDetailsServiceImpl;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-	
+
 	@Autowired
 	UserDetailsServiceImpl userDetailServiceImpl;
 
 	@Autowired
 	private TokenHelper tokenHelper;
-	
+
 	@Autowired
 	JwtVariable jwtVariable;
 
@@ -35,20 +35,18 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 		System.out.println("Got token: " + authToken);
 
 		if (tokenHelper.validateToken(authToken)) {
-			if (authToken != null) {
-				String username = tokenHelper.getUsernameFromToken(authToken);
-				if (username != null) {
-					UserDetails userDetails = userDetailServiceImpl.loadUserByUsername(username);
+			String username = tokenHelper.getUsernameFromToken(authToken);
+			if (username != null) {
+				UserDetails userDetails = userDetailServiceImpl.loadUserByUsername(username);
 
-					TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
-					authentication.setToken(authToken);
-					SecurityContextHolder.getContext().setAuthentication(authentication);
-				} else {
-					error = "Username from token can't be found in DB.";
-				}
+				TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
+				authentication.setToken(authToken);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			} else {
+				error = "Username from token can't be found in DB.";
 			}
 		} else {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null) {
 				System.out.println(auth.getName());
 			}

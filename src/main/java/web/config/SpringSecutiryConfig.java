@@ -65,7 +65,7 @@ public class SpringSecutiryConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 
 		// @formatter:off
-		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class).authorizeRequests();
+		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);//.authorizeRequests();
     	http.formLogin()
         .loginPage("/login")
         .loginProcessingUrl("/login_check")
