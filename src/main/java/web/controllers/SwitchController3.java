@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import web.DAO.SwitchRepository;
+import web.GlobalVar.JwtVariable;
 import web.models.Switch;
 import web.security.TokenHelper;
 
@@ -47,9 +48,12 @@ public class SwitchController3 {
 	@Autowired
 	TokenHelper tokenHelper;
 	
+	@Autowired
+	JwtVariable jwtVariable;
+	
 	@RequestMapping(value = "switch", method = RequestMethod.POST)
 	public ResponseEntity<HttpStatus> createSwitch(@RequestBody Switch body, HttpServletRequest req) {
-		String token = req.getHeader("Authentication");
+		String token = req.getHeader(jwtVariable.getHEADER());
 		System.out.println("Token: " + token);
 		if (token == null || !tokenHelper.validateToken(token)) {
 			System.out.println("Invalid token!");
